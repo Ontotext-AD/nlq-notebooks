@@ -112,3 +112,7 @@ def test_eval_sparql_query_iri_which_is_not_stored(graphdb: GraphDB) -> None:
         graphdb.eval_sparql_query("PREFIX voc: <https://swapi.co/voc/> SELECT * { ?character voc:unknown \"red\"}")
     assert ("The following IRIs are not used in the data stored in GraphDB: "
             "<https://swapi.co/vocabulary/unknown>") == str(exc.value)
+
+
+def test_get_autocomplete_labels(graphdb: GraphDB) -> None:
+    assert graphdb.autocomplete_labels() == {"http://www.w3.org/2000/01/rdf-schema#label"}
