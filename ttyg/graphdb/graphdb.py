@@ -112,6 +112,26 @@ class GraphDB:
         )
         return sparql_result["boolean"]
 
+    def autocomplete_labels(self) -> set[str]:
+        """
+        Returns all labels registered in the autocomplete plugin,
+        which are returned by GraphDB /rest/autocomplete/labels endpoint
+
+        :return: the set of labels
+        :rtype: set[str]
+        """
+        response = self.__get_request(
+            f"{self.__base_url}/rest/autocomplete/labels",
+            headers={
+                "Accept": "application/json",
+                "X-GraphDB-Repository": self.__repository_id,
+            },
+        )
+        labels = set()
+        for label in response.json():
+            labels.add(label["labelIri"])
+        return labels
+
     def similarity_index_exists(self, index_name: str) -> bool:
         """
         Checks if a similarity index with the provided name exists
@@ -391,7 +411,13 @@ class GraphDB:
         iris = full_iris | prefixed_iris_to_full_iris
         iris = set(
             filter(
-                lambda x: not x.startswith("http://www.w3.org/2001/XMLSchema#"),
+                lambda x: (
+                              not x.startswith("http://www.w3.org/2001/XMLSchema#")
+                          ) and (
+                              not x.startswith("http://www.ontotext.com/owlim/RDFRank#")
+                          ) and (
+                              not x.startswith("http://www.ontotext.com/plugins/autocomplete#")
+                          ),
                 iris
             )
         )
